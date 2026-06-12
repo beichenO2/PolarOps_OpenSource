@@ -60,14 +60,6 @@ DiGist / KnowLever 的「编译失败」「队列积压」是**业务级异常**
 
 ---
 
-## 页面预览
-
-> GUI 嵌入 [PolarCopilot](https://github.com/beichenO2/PolarCopilot) Hub Console 的检修历史页。用 Cursor **Open Folder** 打开本仓库根目录预览 Markdown 图片。
-
-![检修事件列表 — PolarCopilot Console Checkup Widget](screenshots/checkup-events.png)
-
----
-
 ## 架构
 
 ```
@@ -89,7 +81,6 @@ PolarOps/
 ├── capabilities.json            # 5 个 HTTP capability
 ├── polaris.json                 # SSoT 需求定义（R1–R2）
 ├── PolarSoul.md                 # 设计灵魂与决策记录
-└── screenshots/                 # README 预览图
 ```
 
 **数据流：**
