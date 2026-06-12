@@ -1,0 +1,10 @@
+{
+  "project": "digist",
+  "available": true,
+  "status": {
+    "total_items": 150,
+    "last_crawl_at": "2026-05-09T09:00:00.000Z",
+    "scheduler_running": true
+  },
+  "last_check": "2026-05-09T10:00:00.000Z"
+}

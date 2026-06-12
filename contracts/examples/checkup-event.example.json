@@ -1,0 +1,9 @@
+{
+  "event_id": "evt_abc123",
+  "project": "KnowLever",
+  "agent_target": "compile",
+  "page_url": "http://localhost:4800/wiki/test",
+  "page_title": "Test Page",
+  "user_text": "Compile failed with error",
+  "timestamp": "2026-05-09T10:00:00.000Z"
+}

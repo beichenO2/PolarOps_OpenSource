@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Checkup API",
+  "description": "PolarOps checkup event aggregation endpoint.",
+  "type": "object",
+  "required": ["event_id", "project", "timestamp"],
+  "properties": {
+    "event_id": { "type": "string" },
+    "project": { "type": "string" },
+    "agent_target": { "type": "string" },
+    "page_url": { "type": "string" },
+    "page_title": { "type": "string" },
+    "user_text": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

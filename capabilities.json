@@ -1,0 +1,71 @@
+{
+  "project": "PolarOps",
+  "version": "0.1.0",
+  "capabilities": [
+    {
+      "id": "polarops.checkup.aggregate",
+      "service_name": "polar-ops",
+      "description": "Aggregate cross-project checkup events forwarded from PolarCopilot Hub",
+      "transport": "http",
+      "endpoint": "/api/checkup-events",
+      "method": "POST",
+      "idempotent": false,
+      "side_effects": true,
+      "timeout_ms": 3000,
+      "migrated_from": "SOTAgent",
+      "status": "core"
+    },
+    {
+      "id": "polarops.digist.status",
+      "service_name": "polar-ops",
+      "description": "Get DiGist monitoring status",
+      "transport": "http",
+      "endpoint": "/api/digist/status",
+      "method": "GET",
+      "idempotent": true,
+      "side_effects": false,
+      "timeout_ms": 3000,
+      "migrated_from": "SOTAgent",
+      "status": "core"
+    },
+    {
+      "id": "polarops.digist.interests",
+      "service_name": "polar-ops",
+      "description": "List/manage DiGist interests",
+      "transport": "http",
+      "endpoint": "/api/digist/interests",
+      "method": "GET",
+      "idempotent": true,
+      "side_effects": false,
+      "timeout_ms": 3000,
+      "migrated_from": "SOTAgent",
+      "status": "core"
+    },
+    {
+      "id": "polarops.knowlever.status",
+      "service_name": "polar-ops",
+      "description": "Get KnowLever pipeline monitoring status",
+      "transport": "http",
+      "endpoint": "/api/knowlever/status",
+      "method": "GET",
+      "idempotent": true,
+      "side_effects": false,
+      "timeout_ms": 3000,
+      "migrated_from": "SOTAgent",
+      "status": "core"
+    },
+    {
+      "id": "polarops.knowlever.topics",
+      "service_name": "polar-ops",
+      "description": "List KnowLever topics with pipeline status",
+      "transport": "http",
+      "endpoint": "/api/knowlever/topics",
+      "method": "GET",
+      "idempotent": true,
+      "side_effects": false,
+      "timeout_ms": 5000,
+      "migrated_from": "SOTAgent",
+      "status": "core"
+    }
+  ]
+}

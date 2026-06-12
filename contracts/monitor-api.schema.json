@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Monitor API",
+  "description": "PolarOps project monitoring status.",
+  "type": "object",
+  "required": ["project", "available"],
+  "properties": {
+    "project": { "type": "string", "enum": ["digist", "knowlever"] },
+    "available": { "type": "boolean" },
+    "status": { "type": "object" },
+    "last_check": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

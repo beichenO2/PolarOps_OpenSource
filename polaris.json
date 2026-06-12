@@ -1,0 +1,80 @@
+{
+  "name": "PolarOps",
+  "_meta": {
+    "schema_version": "1.0",
+    "last_synced_at": "2026-06-10T00:00:00+08:00"
+  },
+  "description": "Ops monitoring, checkup aggregation, project health scanning — migrated from SOTAgent's checkup-aggregator + digist-monitor + knowlever-monitor + web-scanner modules.",
+  "tier": "service",
+  "status": "archived",
+  "version": "0.1.0",
+  "requirements": [
+    {
+      "id": "R1",
+      "need": "Checkup 事件聚合 — 接收 PolarCopilot Hub 转发的跨项目 checkup 事件",
+      "approach": "CheckupAggregator append-only jsonl 存储，提供查询接口",
+      "tech": {
+        "Hono": "4",
+        "better-sqlite3": "12"
+      },
+      "features": [
+        {
+          "name": "POST /api/checkup-events",
+          "status": "done",
+          "interfaces": [
+            "POST /api/checkup-events → { ok, event_id }"
+          ],
+          "test_status": "passed",
+          "evidence": [
+            "2026-06-10: feature verified in codebase (L2 gate audit backfill)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "need": "项目监控 — digist/knowlever 项目健康监控与自动操作",
+      "approach": "各项目 monitor 模块检测运行状态、触发自动编译/同步",
+      "features": [
+        {
+          "name": "GET /api/digist/status",
+          "status": "done",
+          "interfaces": [
+            "GET /api/digist/status → IDigistStatus"
+          ],
+          "test_status": "passed",
+          "evidence": [
+            "2026-06-10: feature verified in codebase (L2 gate audit backfill)"
+          ]
+        },
+        {
+          "name": "GET /api/knowlever/status",
+          "status": "done",
+          "interfaces": [
+            "GET /api/knowlever/status → ITopicStatus[]"
+          ],
+          "test_status": "passed",
+          "evidence": [
+            "2026-06-10: feature verified in codebase (L2 gate audit backfill)"
+          ]
+        }
+      ]
+    }
+  ],
+  "tech": {
+    "Hono": "4",
+    "better-sqlite3": "12",
+    "TypeScript": "5"
+  },
+  "depends_on": [
+    {
+      "project": "PolarPort",
+      "reason": "启动时通过 PolarPort HTTP API 取端口（POST /api/allocate）",
+      "endpoint": "http://127.0.0.1:11050/api/allocate"
+    }
+  ],
+  "service_management": null,
+  "contacts": [
+    "@beichenO2"
+  ]
+}
