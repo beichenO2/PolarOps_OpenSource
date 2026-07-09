@@ -11,7 +11,7 @@ import path from 'node:path';
 const POLARISOR = path.join(process.env.HOME || '~', 'Polarisor');
 const DIGIST_ROOT = path.join(POLARISOR, 'digist');
 const DEFAULT_DB_PATH = path.join(DIGIST_ROOT, 'data', 'digist.sqlite');
-const DIGIST_API_URL = (process.env.DIGIST_API_URL || 'http://127.0.0.1:4880').replace(/\/$/, '');
+const DIGIST_API_URL = (process.env.DIGIST_API_URL || 'http://127.0.0.1:3800').replace(/\/$/, '');
 
 export interface IDigistStatus {
   available: boolean;
