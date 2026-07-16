@@ -2,7 +2,7 @@
   "name": "PolarOps",
   "_meta": {
     "schema_version": "1.0",
-    "last_synced_at": "2026-06-10T00:00:00+08:00"
+    "last_synced_at": "2026-07-16T09:12:00+08:00"
   },
   "description": "Ops monitoring, checkup aggregation, project health scanning — migrated from SOTAgent's checkup-aggregator + digist-monitor + knowlever-monitor + web-scanner modules.",
   "tier": "service",
@@ -59,6 +59,38 @@
           ]
         }
       ]
+    },
+    {
+      "id": "R3",
+      "need": "统一运行时治理 — 所有持久端口由 PolarPort 管理，所有进程生命周期由 PolarProcess 管理",
+      "approach": "前台 Start/start.sh 申领 preferred 11065 并注入 PORT，PolarProcess 注册 launcher 且默认不自启",
+      "features": [
+        {
+          "name": "PolarOps runtime governance",
+          "status": "done",
+          "test_status": "passed",
+          "behavior": [
+            "PolarPort 是端口申领、校验和释放的唯一权威",
+            "PolarProcess 是启动、停止、重启和 PID 所有权的唯一权威",
+            "服务以前台进程运行并提供 /api/health",
+            "迁移期间只注册 stopped 服务，不启动、不申领端口"
+          ],
+          "evidence": [
+            {
+              "date": "2026-07-16",
+              "description": "迁移预检：PolarPort 与 PolarProcess 健康；PolarOps 未注册；11065 无 listener；治理审计仅报告 service_management 缺失"
+            },
+            {
+              "date": "2026-07-16",
+              "description": "canonical main 验证：npm test 3 个测试文件、24 项测试全部通过；npm run build、jq、bash -n 和项目治理审计通过"
+            },
+            {
+              "date": "2026-07-16",
+              "description": "PolarProcess 注册 polarops：status=stopped、pid=null、auto_start=false；PolarPort 无 active 记录且 11065 无 listener"
+            }
+          ]
+        }
+      ]
     }
   ],
   "tech": {
@@ -73,7 +105,15 @@
       "endpoint": "http://127.0.0.1:11050/api/allocate"
     }
   ],
-  "service_management": null,
+  "service_management": {
+    "install_command": "npm ci && npm run build",
+    "start_command": "bash Start/start.sh",
+    "restart_command": "bash Start/start.sh",
+    "health_endpoint": "http://127.0.0.1:11065/api/health",
+    "preferred_port": 11065,
+    "service_id": "polarops",
+    "auto_start": false
+  },
   "contacts": [
     "@beichenO2"
   ]

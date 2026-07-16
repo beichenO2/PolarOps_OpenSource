@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { CheckupAggregator } from '../../src/checkup-aggregator.js';
-import { createApp } from '../../src/server.js';
+import {
+  createApp,
+  isServerEntrypoint,
+  resolveRuntimePort,
+} from '../../src/server.js';
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -18,6 +22,30 @@ describe('PolarOps integration', () => {
 
   afterAll(() => {
     try { fs.rmSync(TEST_DIR, { recursive: true }); } catch { /* ignore */ }
+  });
+
+  describe('runtime port configuration', () => {
+    it('accepts a valid injected port', () => {
+      expect(resolveRuntimePort('11065')).toBe(11065);
+    });
+
+    it.each([undefined, '', 'abc', '0', '65536', '11065.5'])(
+      'rejects invalid PORT %s',
+      (value) => {
+        expect(() => resolveRuntimePort(value)).toThrow(
+          'PORT must be an integer between 1 and 65535',
+        );
+      },
+    );
+
+    it('recognizes the compiled server entrypoint', () => {
+      expect(
+        isServerEntrypoint('file:///tmp/polarops/dist/server.js', '/tmp/polarops/dist/server.js'),
+      ).toBe(true);
+      expect(
+        isServerEntrypoint('file:///tmp/polarops/dist/server.js', '/tmp/polarops/dist/worker.js'),
+      ).toBe(false);
+    });
   });
 
   describe('CheckupAggregator', () => {

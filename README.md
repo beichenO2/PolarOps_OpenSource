@@ -23,10 +23,10 @@ cd Polarisor
 ```bash
 git clone https://github.com/beichenO2/PolarOps.git
 cd PolarOps
-npm install
+npm ci
 ```
 
-**环境要求：** Node.js ≥ 22 · 端口由 PolarPort 分配（默认 **11065**）
+**环境要求：** Node.js ≥ 22 · PolarPort `:11050` · PolarProcess `:11055`
 
 ---
 
@@ -55,8 +55,8 @@ DiGist / KnowLever 的「编译失败」「队列积压」是**业务级异常**
 | **监控模块** | **4** 个（CheckupAggregator · DiGistMonitor · KnowLeverMonitor · WebScanner） |
 | **检修事件** | append-only **jsonl** 持久化；契约对齐 `Agent_core/contracts/checkup-event.schema.json` |
 | **仓库扫描** | 按需扫描 Polarisor 根目录全部 Git 仓库（分支/sync/dirty 状态） |
-| **自动化测试** | **11** 个测试（7 集成 + 4 契约，Vitest + AJV） |
-| **默认端口** | **11065**（`polar-ops` / PolarOps） |
+| **自动化测试** | **24** 个测试（18 集成 + 4 契约 + 2 运行时治理，Vitest + AJV） |
+| **治理端口** | **11065**（`polarops` / PolarOps，由 PolarPort 申领） |
 
 ---
 
@@ -69,7 +69,9 @@ PolarOps/
 │   ├── digist-monitor.ts        # DiGist 爬取/队列状态监控
 │   ├── knowlever-monitor.ts     # KnowLever 编译/Wiki 管道监控
 │   ├── web-scanner.ts           # Git 仓库健康扫描（分支/sync/dirty）
-│   └── server.ts                # Hono HTTP 服务（默认 :11065）
+│   └── server.ts                # Hono HTTP 服务（消费 launcher 注入的 PORT）
+├── Start/
+│   └── start.sh                 # PolarPort 申领 + 前台 exec
 ├── contracts/
 │   ├── checkup-api.schema.json  # 检修事件契约
 │   ├── monitor-api.schema.json  # 监控状态契约
@@ -79,7 +81,7 @@ PolarOps/
 │   └── contracts/               # JSON Schema 校验
 ├── data/                        # checkup-events.jsonl（gitignored）
 ├── capabilities.json            # 5 个 HTTP capability
-├── polaris.json                 # SSoT 需求定义（R1–R2）
+├── polaris.json                 # SSoT 需求定义（R1–R3）
 ├── PolarSoul.md                 # 设计灵魂与决策记录
 ```
 
@@ -101,11 +103,12 @@ Polarisor repos    ──git scan───▶ /api/scan
 ## 快速开始
 
 ```bash
-npm install
-npm run dev           # 开发模式（tsx --watch）
-npm run start         # 生产启动（端口由 PolarPort 分配）
-npm test              # 11 个契约 + 集成测试
+npm ci
+npm run build
+npm test
 ```
+
+PolarOps 是持久服务，不直接执行 `npm run start`、`npm run dev` 或 `node dist/server.js`。`npm` 的持久入口统一指向 `bash Start/start.sh`，仅供 PolarProcess 以 service ID `polarops` 调用；启动、停止和重启都通过 PolarProcess 完成。launcher 向 PolarPort 申领 preferred `11065` 后以前台进程运行，项目默认 `auto_start=false`。
 
 常用 API：
 
@@ -135,11 +138,11 @@ curl http://127.0.0.1:11065/api/scan
 
 | 项目 | 角色 | 是否必须 |
 |------|------|----------|
-| [PolarPort](https://github.com/beichenO2/PolarPort) | 启动时端口分配 | 推荐 |
+| [PolarPort](https://github.com/beichenO2/PolarPort) | 唯一端口申领与释放权威 | 必须 |
 | [PolarCopilot](https://github.com/beichenO2/PolarCopilot) | Hub 检修事件转发来源 + Checkup Widget 消费方 | 推荐 |
-| [Agent_core](https://github.com/beichenO2/Agent_core) | `checkup-event` 契约与共享脚本 | 推荐 |
+| [Agent_core](https://github.com/beichenO2/Agent_core) | `checkup-event` 契约与 `port-claim.sh` | 必须 |
 | [SOTAgent](https://github.com/beichenO2/SOTAgent) | capability 注册与生态服务发现 | 可选 |
-| [PolarProcess](https://github.com/beichenO2/PolarProcess) | 进程守护（与监控职责分离，不直接依赖） | 可选 |
+| [PolarProcess](https://github.com/beichenO2/PolarProcess) | 唯一进程生命周期与 PID 权威 | 必须 |
 
 ---
 

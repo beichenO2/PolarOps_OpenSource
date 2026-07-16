@@ -2,13 +2,13 @@
  * server.ts — PolarOps Hono server.
  *
  * Mounts checkup/digist/knowlever/scan endpoints.
- * Allocates a port via PolarPort HTTP API on startup.
+ * The governed launcher injects the PolarPort-claimed port through PORT.
  */
 
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import path from 'node:path';
-import os from 'node:os';
+import { pathToFileURL } from 'node:url';
 import { CheckupAggregator } from './checkup-aggregator.js';
 import { DigistMonitor } from './digist-monitor.js';
 import { KnowLeverMonitor } from './knowlever-monitor.js';
@@ -16,8 +16,18 @@ import { scanAllRepos } from './web-scanner.js';
 
 const DATA_DIR = process.env.POLAROPS_DATA_DIR
   ?? path.join(process.env.HOME ?? '', 'Polarisor', 'PolarOps', 'data');
-const DEFAULT_PORT = Number(process.env.POLAROPS_PORT ?? 11065);
-const POLARPORT_URL = process.env.POLARPORT_URL ?? 'http://127.0.0.1:11050';
+
+export function resolveRuntimePort(value: string | undefined): number {
+  const port = Number(value);
+  if (!value || !Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error('PORT must be an integer between 1 and 65535');
+  }
+  return port;
+}
+
+export function isServerEntrypoint(moduleUrl: string, argvPath: string | undefined): boolean {
+  return Boolean(argvPath && moduleUrl === pathToFileURL(path.resolve(argvPath)).href);
+}
 
 export function createApp(aggregator: CheckupAggregator): Hono {
   const app = new Hono();
@@ -75,26 +85,6 @@ export function createApp(aggregator: CheckupAggregator): Hono {
   return app;
 }
 
-async function claimPort(): Promise<number> {
-  try {
-    const r = await fetch(`${POLARPORT_URL}/api/allocate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        service_name: 'polar-ops',
-        project: 'PolarOps',
-        preferred_port: DEFAULT_PORT,
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-    if (r.ok) {
-      const data = (await r.json()) as { ok?: boolean; port?: number };
-      if (data.ok && typeof data.port === 'number') return data.port;
-    }
-  } catch { /* PolarPort unreachable — fall back */ }
-  return DEFAULT_PORT;
-}
-
 async function registerCapabilities(): Promise<void> {
   const sotagentBase = process.env.SOTAGENT_URL ?? 'http://127.0.0.1:4800';
   try {
@@ -118,7 +108,7 @@ async function registerCapabilities(): Promise<void> {
 async function main(): Promise<void> {
   const aggregator = new CheckupAggregator();
   const app = createApp(aggregator);
-  const port = await claimPort();
+  const port = resolveRuntimePort(process.env.PORT);
 
   serve({ fetch: app.fetch, port, hostname: '127.0.0.1' }, (info) => {
     console.log(`PolarOps listening on http://127.0.0.1:${info.port}`);
@@ -127,6 +117,6 @@ async function main(): Promise<void> {
   await registerCapabilities();
 }
 
-if (process.argv[1] && process.argv[1].endsWith('server.ts')) {
+if (isServerEntrypoint(import.meta.url, process.argv[1])) {
   void main();
 }

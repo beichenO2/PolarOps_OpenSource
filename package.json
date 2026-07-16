@@ -6,8 +6,8 @@
   "engines": { "node": ">=22" },
   "scripts": {
     "build": "tsc",
-    "start": "tsx src/server.ts",
-    "dev": "tsx --watch src/server.ts",
+    "start": "bash Start/start.sh",
+    "dev": "bash Start/start.sh",
     "test": "vitest run",
     "test:watch": "vitest"
   },
